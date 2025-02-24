@@ -23,16 +23,22 @@ struct SessionHistory: Identifiable, Codable {
     let startTime: String
     let endTime: String
     
-    var duration: TimeInterval {
-        let formatter = ISO8601DateFormatter()
-        formatter.formatOptions = [.withInternetDateTime]
+    
+    
+    var timeDifference: String {
+        let dateFormatter = DateFormatter()
+        dateFormatter.dateFormat = "yyyy-MM-dd'T'HH:mm:ss"
         
-        guard let start = formatter.date(from: startTime),
-              let end = formatter.date(from: endTime) else {
-            return 0
+        guard let start = dateFormatter.date(from: startTime),
+              let end = dateFormatter.date(from: endTime) else {
+            return "00:00"
         }
         
-        return end.timeIntervalSince(start)
+        let diffSeconds = Int(end.timeIntervalSince(start))
+        let hours = diffSeconds / 3600
+        let minutes = (diffSeconds % 3600) / 60
+        
+        return String(format: "%02d:%02d", hours, minutes)
     }
 }
 

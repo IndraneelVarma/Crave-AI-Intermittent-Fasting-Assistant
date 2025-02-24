@@ -7,9 +7,20 @@ class FastingViewModel: ObservableObject {
     @Published var error: String? = nil
     
     var averageDurationFormatted: String {
-        let totalDuration = sessions.reduce(0.0) { $0 + $1.duration }
-        let averageDuration = sessions.isEmpty ? 0 : totalDuration / Double(sessions.count)
+        guard !sessions.isEmpty else { return "00:00" }
         
+        let dateFormatter = DateFormatter()
+        dateFormatter.dateFormat = "yyyy-MM-dd'T'HH:mm:ss"
+        
+        let totalDuration = sessions.reduce(0.0) { partialResult, session in
+            guard let startDate = dateFormatter.date(from: session.startTime),
+                  let endDate = dateFormatter.date(from: session.endTime) else {
+                return partialResult
+            }
+            return partialResult + endDate.timeIntervalSince(startDate)
+        }
+        
+        let averageDuration = totalDuration / Double(sessions.count)
         let hours = Int(averageDuration) / 3600
         let minutes = Int(averageDuration.truncatingRemainder(dividingBy: 3600)) / 60
         
@@ -51,6 +62,13 @@ class FastingViewModel: ObservableObject {
             print("Session data: \(fetchedSessions)")
             
             self.sessions = fetchedSessions
+            
+            //fake sample data below
+          /*  self.sessions.append(SessionHistory(startTime: "2025-02-23T16:22:56", endTime: "2025-02-24T10:20:56"))
+            self.sessions.append(SessionHistory(startTime: "2025-02-24T16:22:56", endTime: "2025-02-25T08:40:56"))
+            self.sessions.append(SessionHistory(startTime: "2025-02-25T16:22:56", endTime: "2025-02-26T06:40:56")) */
+            
+            
             self.isLoading = false
             print("Updated sessions array in ViewModel")
             

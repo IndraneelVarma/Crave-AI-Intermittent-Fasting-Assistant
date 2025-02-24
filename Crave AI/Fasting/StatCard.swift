@@ -39,15 +39,30 @@ struct FastingSessionCard: View {
     let session: SessionHistory
     
     private func formatDate(_ dateString: String) -> String {
-           let dateFormatter = DateFormatter()
-           dateFormatter.dateFormat = "yyyy-MM-dd'T'HH:mm:ss"
-           
-           if let date = dateFormatter.date(from: dateString) {
-               dateFormatter.dateFormat = "MMM d, h:mm a" // Feb 23, 2:47 PM
-               return dateFormatter.string(from: date)
-           }
-           return dateString // Return original string if parsing fails
-       }
+        let dateFormatter = DateFormatter()
+        
+        // Set input format for parsing
+        dateFormatter.dateFormat = "yyyy-MM-dd'T'HH:mm:ss"
+        // Assume input is in UTC
+        dateFormatter.timeZone = TimeZone(abbreviation: "UTC")
+        
+        if let date = dateFormatter.date(from: dateString) {
+            // Switch to device's timezone for output
+            dateFormatter.timeZone = TimeZone.current
+            dateFormatter.dateFormat = "MMM d, h:mm a" // Feb 23, 2:47 PM
+            return dateFormatter.string(from: date)
+        }
+        
+        // If parsing fails, try alternate format without seconds
+        dateFormatter.dateFormat = "yyyy-MM-dd'T'HH:mm"
+        if let date = dateFormatter.date(from: dateString) {
+            dateFormatter.timeZone = TimeZone.current
+            dateFormatter.dateFormat = "MMM d, h:mm a"
+            return dateFormatter.string(from: date)
+        }
+        
+        return dateString // Return original string if all parsing attempts fail
+    }
     
     private func formatTime(_ time: TimeInterval) -> String {
         let hours = Int(time) / 3600
@@ -63,7 +78,7 @@ struct FastingSessionCard: View {
                     .foregroundColor(.blue)
                 
                 VStack(alignment: .leading, spacing: 4) {
-                    Text(formatTime(session.duration))
+                    Text(session.timeDifference)
                         .font(.system(size: 20, weight: .semibold))
                     Text("Duration")
                         .font(.subheadline)
@@ -71,10 +86,16 @@ struct FastingSessionCard: View {
                 }
                 
                 Spacer()
-                
-                Image(systemName: "checkmark.circle.fill")
-                    .font(.system(size: 20))
-                    .foregroundColor(.green)
+                if Int(session.timeDifference.prefix(2)) ?? 0 >= 16 { //add goal based checking later
+                    Image(systemName: "checkmark.circle.fill")
+                        .font(.system(size: 20))
+                        .foregroundColor(.green)
+                }
+                else {
+                    Image(systemName: "x.circle.fill")
+                        .font(.system(size: 20))
+                        .foregroundColor(.red)
+                }
             }
             
             Divider()
