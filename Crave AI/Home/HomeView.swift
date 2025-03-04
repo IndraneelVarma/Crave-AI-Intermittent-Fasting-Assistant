@@ -19,6 +19,11 @@ struct HomeView: View {
                         Label("History", systemImage: "chart.bar.fill")
                     }
             }
+            .onAppear(){
+                print("Name: \(UserDefaults.standard.string(forKey: "userName"))")
+                print("Goal: \(UserDefaults.standard.string(forKey: "goal"))")
+                print("Schedule: \(UserDefaults.standard.string(forKey: "schedule"))")
+            }
             .tint(.blue)
             .navigationDestination(isPresented: $logout) {
                 AuthView()

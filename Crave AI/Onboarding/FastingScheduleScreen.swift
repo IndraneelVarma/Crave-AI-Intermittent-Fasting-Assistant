@@ -48,7 +48,9 @@ struct FastingScheduleScreen: View {
                 
                 // Complete button
                 Button(action: {
-                    viewModel.completeOnboarding()
+                    Task{
+                        await viewModel.completeOnboarding()
+                    }
                     showHome = true
                 }) {
                     Text("Start My Journey")

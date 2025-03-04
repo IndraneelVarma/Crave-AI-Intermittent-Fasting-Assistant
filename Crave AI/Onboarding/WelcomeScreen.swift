@@ -2,6 +2,7 @@ import SwiftUI
 
 struct WelcomeScreen: View {
     @ObservedObject var viewModel: OnboardingViewModel
+    @State private var showHome = false
     
     var body: some View {
         ZStack {
@@ -46,7 +47,17 @@ struct WelcomeScreen: View {
                 Spacer()
                 
                 // Start button
-                Button(action: { viewModel.nextStep() }) {
+                Button(action: {
+                    if UserDefaults.standard.bool(forKey: "newUser"){
+                        viewModel.nextStep()
+                    }
+                    else {
+                        Task{
+                            await viewModel.fetchData()
+                        }
+                        showHome = true
+                    }
+                }) {
                     Text("Get Started")
                         .font(.system(size: 18, weight: .semibold))
                         .frame(maxWidth: .infinity)
@@ -59,6 +70,10 @@ struct WelcomeScreen: View {
                 .padding(.horizontal, 32)
                 .padding(.bottom, 40)
             }
+        }
+        .navigationDestination(isPresented: $showHome) {
+            HomeView()
+                .interactiveDismissDisabled(true)
         }
     }
 }

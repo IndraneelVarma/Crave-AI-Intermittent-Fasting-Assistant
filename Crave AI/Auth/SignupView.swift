@@ -65,6 +65,8 @@ struct SignupView: View {
         .navigationBarBackButtonHidden(true)
         .onChange(of: viewModel.success) { newValue in
             if newValue {
+                UserDefaults.standard.set(true, forKey: "newUser")
+                UserDefaults.standard.set(viewModel.email, forKey: "email")
                 showOnboarding = true
             }
         }

@@ -37,7 +37,7 @@ struct FastingOptionCard: View {
         switch schedule {
         case "16:8": return "16 hours fasting, 8 hours eating window"
         case "18:6": return "18 hours fasting, 6 hours eating window"
-        case "24-Hour Fast": return "Full day fast, once or twice a week"
+        case "24-Hour Fast": return "Full day fast, one meal a day"
         default: return ""
         }
     }

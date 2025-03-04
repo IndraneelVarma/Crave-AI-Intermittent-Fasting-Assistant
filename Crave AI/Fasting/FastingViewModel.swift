@@ -36,9 +36,6 @@ class FastingViewModel: ObservableObject {
                 .execute()
             print("Session saved successfully. Response: \(response)")
             
-            // Refresh sessions after successful upload
-            await fetchSessions()
-            
         } catch {
             self.error = error.localizedDescription
             print("Error saving session: \(error)")
@@ -55,6 +52,7 @@ class FastingViewModel: ObservableObject {
             let fetchedSessions: [SessionHistory] = try await supabase
                 .from("FastingSessions")
                 .select()
+                .eq("email", value: UserDefaults.standard.string(forKey: "email"))
                 .execute()
                 .value
             
